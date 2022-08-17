@@ -3,7 +3,6 @@ package data
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import model.Car
@@ -51,5 +50,22 @@ class DatabaseHandler(context: Context) :
             cursor.getString(0).toInt(),
             cursor.getString(1), cursor.getString(2)
         )
+    }
+
+    fun getAllCars(): List<Car> {
+        val db = this.readableDatabase
+        val carsList: MutableList<Car> = ArrayList()
+        val selectAllCars = "SELECT * FROM ${Util.TABLE_NAME}"
+        val cursor = db.rawQuery(selectAllCars, null)
+        if (cursor.moveToFirst()) {
+            do {
+                val car = Car()
+                car.id = cursor.getString(0).toInt()
+                car.name = cursor.getString(1)
+                car.price = cursor.getString(2)
+                carsList.add(car)
+            } while (cursor.moveToNext())
+        }
+        return carsList
     }
 }
