@@ -3,6 +3,7 @@ package data
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import model.Car
@@ -67,5 +68,31 @@ class DatabaseHandler(context: Context) :
             } while (cursor.moveToNext())
         }
         return carsList
+    }
+
+    fun updateCar(car: Car): Int {
+        val db = this.writableDatabase
+        val contentValues = ContentValues()
+        contentValues.put(Util.KEY_NAME, car.name)
+        contentValues.put(Util.KEY_PRICE, car.price)
+        return db.update(
+            Util.TABLE_NAME,
+            contentValues,
+            "${Util.KEY_ID}=?",
+            arrayOf(car.id.toString())
+        )
+    }
+
+    fun deleteCar(car: Car) {
+        val db = this.writableDatabase
+        db.delete(Util.TABLE_NAME, "${Util.KEY_ID}=?", arrayOf(car.id.toString()))
+        db.close()
+    }
+
+    fun getCarsCount(): Int {
+        val db = this.readableDatabase
+        val countQuery = "SELECT * FROM " + Util.TABLE_NAME
+        val cursor: Cursor = db.rawQuery(countQuery, null)
+        return cursor.count
     }
 }
